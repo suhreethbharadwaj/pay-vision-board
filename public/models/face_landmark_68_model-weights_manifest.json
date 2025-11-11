@@ -1,0 +1,1 @@
+[{"weights":[{"name":"fc0/weights","shape":[512,136],"dtype":"float32"},{"name":"fc0/bias","shape":[136],"dtype":"float32"}],"paths":["face_landmark_68_model-shard1"]}]
