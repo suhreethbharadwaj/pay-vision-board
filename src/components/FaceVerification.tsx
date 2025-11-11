@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Camera, CheckCircle, XCircle } from 'lucide-react';
+import { Camera, CheckCircle, XCircle, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useFaceDetection } from '@/hooks/useFaceDetection';
 import { toast } from 'sonner';
@@ -69,10 +69,10 @@ export const FaceVerification = ({ rfidTag, onVerified, onFailed }: FaceVerifica
     // Start visual debugging overlay
     startVisualDebug();
     
-    // Wait for camera and face detector to fully initialize
+    // Wait for camera and face detector to fully initialize (longer delay)
     setTimeout(() => {
       verifyFace();
-    }, 2000);
+    }, 3500);
   };
 
   const startVisualDebug = () => {
@@ -284,7 +284,7 @@ export const FaceVerification = ({ rfidTag, onVerified, onFailed }: FaceVerifica
         setTimeout(() => {
           stopCamera();
           onVerified(user.id);
-        }, 1500);
+        }, 3000);
       } else {
         console.log(`❌ Face verification FAILED - similarity ${similarity.toFixed(3)} below threshold ${SIMILARITY_THRESHOLD}`);
         toast.error(`Face doesn't match. Similarity: ${(similarity * 100).toFixed(1)}%`);
@@ -292,7 +292,7 @@ export const FaceVerification = ({ rfidTag, onVerified, onFailed }: FaceVerifica
         setTimeout(() => {
           stopCamera();
           onFailed();
-        }, 2000);
+        }, 3000);
       }
     } catch (err) {
       console.error('Error verifying face:', err);
@@ -413,9 +413,16 @@ export const FaceVerification = ({ rfidTag, onVerified, onFailed }: FaceVerifica
         {/* Face guide overlay */}
         {verificationStatus === 'idle' && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className={`w-48 h-60 border-4 rounded-full transition-colors ${
-              faceDetected ? 'border-green-500' : 'border-primary'
+            <div className={`w-48 h-60 border-4 rounded-full transition-all duration-300 ${
+              faceDetected ? 'border-green-500 shadow-lg shadow-green-500/50' : 'border-primary'
             }`} style={{ opacity: 0.5 }} />
+            
+            {/* Green checkmark indicator when face detected */}
+            {faceDetected && (
+              <div className="absolute top-4 right-4 bg-green-500 rounded-full p-2 animate-scale-in shadow-lg">
+                <Check className="w-6 h-6 text-white" strokeWidth={3} />
+              </div>
+            )}
           </div>
         )}
         
