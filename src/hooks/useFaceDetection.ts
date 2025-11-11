@@ -18,11 +18,17 @@ export const useFaceDetection = () => {
         console.log('🔄 Loading face-api.js models from /models...');
         const MODEL_URL = '/models';
         
-        await Promise.all([
-          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-        ]);
+        console.log('📦 Loading TinyFaceDetector...');
+        await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+        console.log('✅ TinyFaceDetector loaded');
+        
+        console.log('📦 Loading FaceLandmark68Net...');
+        await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+        console.log('✅ FaceLandmark68Net loaded');
+        
+        console.log('📦 Loading FaceRecognitionNet...');
+        await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+        console.log('✅ FaceRecognitionNet loaded');
         
         console.log('✅ All face-api.js models loaded successfully!');
         setModelsLoaded(true);
@@ -30,7 +36,8 @@ export const useFaceDetection = () => {
         toast.success('Face detection ready');
       } catch (err) {
         console.error('❌ Error loading face-api.js models:', err);
-        setError('Failed to load face detection models. Ensure models are in /public/models/');
+        console.error('❌ Error details:', JSON.stringify(err, null, 2));
+        setError('Failed to load face detection models. Check console for details.');
         setIsLoading(false);
         toast.error('Failed to load face detection models');
       }
@@ -41,7 +48,7 @@ export const useFaceDetection = () => {
 
   const detectFaces = async (videoElement: HTMLVideoElement) => {
     if (!modelsLoaded) {
-      console.error('❌ Models not loaded yet');
+      console.warn('⚠️ Models not loaded yet, still loading...');
       return null;
     }
     if (!videoElement) {
