@@ -5,11 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import ItemCard from "@/components/canteen/ItemCard";
 import CartSidebar, { CartItem } from "@/components/canteen/CartSidebar";
 import RecentTransactions from "@/components/canteen/RecentTransactions";
-import { FaceVerification } from "@/components/FaceVerification";
 
 interface Item {
   id: string;
@@ -30,8 +28,6 @@ export default function CanteenDashboard() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [showFaceVerification, setShowFaceVerification] = useState(false);
-  const [pendingRfidTag, setPendingRfidTag] = useState<string | null>(null);
 
   const categories = [
     { id: "all", label: "All Items" },
@@ -184,9 +180,8 @@ export default function CanteenDashboard() {
       const rfidTag = recentScans[0].rfid_tag;
       console.log("✅ Found recent scan:", rfidTag);
       
-      // Store the RFID tag and show face verification
-      setPendingRfidTag(rfidTag);
-      setShowFaceVerification(true);
+      // Process payment directly with RFID tag
+      await handleCheckout(rfidTag);
       
     } catch (error) {
       console.error("❌ Manual checkout error:", error);
@@ -195,28 +190,6 @@ export default function CanteenDashboard() {
       });
       setIsProcessing(false);
     }
-  };
-
-  const handleFaceVerified = async (userId: string) => {
-    console.log("✅ Face verified for user:", userId);
-    setShowFaceVerification(false);
-    
-    if (pendingRfidTag) {
-      await handleCheckout(pendingRfidTag);
-    }
-    
-    setPendingRfidTag(null);
-  };
-
-  const handleFaceVerificationFailed = () => {
-    console.log("❌ Face verification failed");
-    setShowFaceVerification(false);
-    setPendingRfidTag(null);
-    setIsProcessing(false);
-    
-    toast.error("Verification Failed", {
-      description: "Face does not match RFID card. Please try again."
-    });
   };
 
   const handleCheckout = async (rfidInput: string) => {
@@ -415,25 +388,6 @@ export default function CanteenDashboard() {
         isProcessing={isProcessing}
         onManualCheckout={handleManualCheckout}
       />
-
-      {/* Face Verification Dialog */}
-      <Dialog open={showFaceVerification} onOpenChange={(open) => {
-        if (!open) {
-          setShowFaceVerification(false);
-          setPendingRfidTag(null);
-          setIsProcessing(false);
-        }
-      }}>
-        <DialogContent className="max-w-2xl">
-          {pendingRfidTag && (
-            <FaceVerification
-              rfidTag={pendingRfidTag}
-              onVerified={handleFaceVerified}
-              onFailed={handleFaceVerificationFailed}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

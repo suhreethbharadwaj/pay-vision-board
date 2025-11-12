@@ -1,5 +1,5 @@
-import { FaceRegistration } from '@/components/FaceRegistration';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,11 +19,13 @@ const AdminPanel = () => {
           </Button>
           <div>
             <h1 className="text-3xl font-bold">Admin Panel</h1>
-            <p className="text-muted-foreground">Manage user face registrations and RFID tags</p>
+            <p className="text-muted-foreground">Manage system settings and users</p>
           </div>
         </div>
 
-        <FaceRegistration />
+        <Card className="p-6">
+          <p className="text-muted-foreground">Admin features coming soon...</p>
+        </Card>
       </div>
     </div>
   );
